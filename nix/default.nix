@@ -20,7 +20,13 @@ let
     sha256 = flake-lock.nodes.nixpkgs.locked.narHash;
   };
 
+  evil-nix-src = builtins.fetchTarball {
+    url = "https://github.com/cdepillabout/evil-nixarchive/${flake-lock.nodes.evil-nix.locked.rev}.tar.gz";
+    sha256 = flake-lock.nodes.evil-nix.locked.narHash;
+  };
+
   overlays = [
+    (import "${evil-nix-src}/nix/overlay.nix")
     (import ./overlay.nix)
   ];
 

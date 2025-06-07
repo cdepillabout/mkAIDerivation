@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-drv-server"
+version = "0.0.1"
+description = "A simple Flask web server for AI derivation handling"
+requires-python = ">=3.12"
+dependencies = [
+    "flask>=3.0.0",
+    "openai>=1.78.0",
+    "requests>=2.31.0",
+]
+
+[project.scripts]
+ai-drv-server = "ai_drv_server.app:main"
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+lint.select = ["ALL"]
+lint.ignore = [
+  "COM812", # Trailing comma missing
+
+  # Ignore missing docstring warnings
+  "D100", # Missing docstring in public module
+  "D101", # Missing docstring in public class
+  "D102", # Missing docstring in public method
+  "D103", # Missing docstring in public function
+  "D104", # Missing docstring in public package
+  "D107", # Missing docstring in __init__
+
+  "E501", # line too long
+
+  "ERA001", # commented out code
+
+  "FIX002", # line contains TODO
+
+  "T201", # use of print().  This is fine for my private project.
+
+  "TCH001", # type-checking blocks for type-checking-only code
+  "TCH002", # type-checking blocks for type-checking-only code
+
+  "TD002", # missing author in TODO
+  "TD003", # missing issue link in line following TODO
+]
+
+[tool.pyright]
+pythonVersion = "3.12"

@@ -1,0 +1,47 @@
+{
+  "nodes": {
+    "evil-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1709871274,
+        "narHash": "sha256-d6rGBkWIr5YPKfzGND4rAv5WFFuMrxMKtgMo8x0TouM=",
+        "owner": "cdepillabout",
+        "repo": "evil-nix",
+        "rev": "39cda20250e0310753d3117aaf6bfa2f7020fcd4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cdepillabout",
+        "repo": "evil-nix",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1749213349,
+        "narHash": "sha256-UAaWOyQhdp7nXzsbmLVC67fo+QetzoTm9hsPf9X3yr4=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "a4ff0e3c64846abea89662bfbacf037ef4b34207",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "ref": "nixpkgs-unstable",
+        "type": "indirect"
+      }
+    },
+    "root": {
+      "inputs": {
+        "evil-nix": "evil-nix",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

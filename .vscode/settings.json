@@ -1,0 +1,15 @@
+{
+    // Use the interpreter that appears first on PATH
+    "python.defaultInterpreterPath": "python",
+  
+    // Let Pylance look inside your source tree
+    "python.analysis.extraPaths": ["${workspaceFolder}/src"],
+  
+    "python.analysis.autoSearchPaths": true,
+    "python.analysis.typeCheckingMode": "basic",
+
+    "[python]": {
+      "editor.formatOnSave": true,
+      "editor.defaultFormatter": "charliermarsh.ruff"
+    },
+  }
