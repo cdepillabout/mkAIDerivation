@@ -201,3 +201,58 @@ Here's a high-level overview of the steps:
 7.  *Could this work with local LLMs?*
 
     Probably?  I haven't thought much about this.
+
+## Hacking on `mkAIDerivation`
+
+In order to hack on `mkAIDerivation` (and `ai-drv-server`), you can get into the
+development shell:
+
+```console
+$ nix develop
+```
+
+Or, without Flakes:
+
+```console
+$ nix-shell
+```
+
+This puts you in a shell with a `python` environment with all the transitive
+dependencies needed by `ai-drv-server`.
+
+You can confirm this by doing:
+
+```console
+$ python
+>>> import flask
+>>> import openai
+```
+
+From this shell, you can easily run `ai-drv-server` with the following shell
+script:
+
+```console
+$ export OPENAI_API_KEY='sk-proj-vU...'
+$ ./server/run-server.py
+```
+
+With the server running, you should be able to build derivations using `mkAIDerivation`.
+
+Or, you could access the server with `curl`:
+
+```console
+$ curl -G --data-urlencode 'req=generate derivation for xterm'  http://localhost:5000/hash
+G9vctDWXtnjjswwmfkJs0msaAJFE+E55doJUCXEO6Fs=
+$ curl -G --data-urlencode 'hash=G9vctDWXtnjjswwmfkJs0msaAJFE+E55doJUCXEO6Fs='  http://localhost:5000/drv
+{ lib, stdenv, fetchurl, xorg, ncurses, freetype, fontconfig, pkg-config, makeWrapper, nixosTests, pkgsCross, gitUpdater, enableDecLocator ? true, }:
+
+stdenv.mkDerivation rec {
+  pname = "xterm";
+  version = "388";
+
+  src = fetchurl {
+    url = "https://invisible-mirror.net/archives/xterm/${pname}-${version}.tgz";
+    hash = "sha256-rEKTReb5N6WUWonUJaJl/ubCFfxmnb3GoDJuIfTF9nQ=";
+  };
+...
+```
