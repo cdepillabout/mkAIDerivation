@@ -41,7 +41,7 @@ lint.ignore = [
 
   "FIX002", # line contains TODO
 
-  "T201", # use of print().  This is fine for my private project.
+  "T201", # use of print().  This is fine for this joke project.
 
   "TCH001", # type-checking blocks for type-checking-only code
   "TCH002", # type-checking blocks for type-checking-only code

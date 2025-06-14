@@ -8,11 +8,21 @@ import requests
 from openai import OpenAI
 from openai.types.responses.response_function_tool_call import ResponseFunctionToolCall
 
+# TODO: This file is a bit of a mess.  There are a lot of things that should be
+# cleaned up here.
+
 # TODO: Don't create this here, but instead in `main()` and pass it down.
 openai_client = OpenAI()
 
+# The model to OpenAI model to use.
+#
+# gpt-4.1 is able to use the web search functionality, but 04-mini is not.
+# However, o4-mini is able to use "reasoning", which could potentially give
+# better results.  YMMV, I'd suggest trying both, or checking:
+# https://lmarena.ai/leaderboard
+#
+# TODO: This should probably be a command-line argument or something.
 openai_model = "gpt-4.1-2025-04-14"
-
 # openai_model = "o4-mini-2025-04-16"
 
 
@@ -281,6 +291,20 @@ def query_openai_responses_api(prompt: str) -> str:
     # TODO: This function is really bad.  The handling of tool calls is quite
     # hacky.
 
+    # We have to keep looping until OpenAI calls our `final_derivation()` tool function.
+    #
+    # This is a bit of a hack, but it's the best way I can think of to handle
+    # the fact that OpenAI's API doesn't easily support Function Calling with a final
+    # Structured Output:
+    # https://community.openai.com/t/how-can-i-use-function-calling-with-response-format-structured-output-feature-for-final-response/965784
+    #
+    # I've never seen this not work.  It seems like OpenAI is pretty good at knowning
+    # it needs to call the `final_derivation()` tool function once at the end.
+    # BUT WHO KNOWS WHAT WILL HAPPEN IN THE FUTURE.
+    #
+    # TODO: I'm sure there are various ways to work around this, including
+    # reaching into the depths of the `openai` library and pulling out their
+    # internal functions for parsing Structured Outputs.
     loop_count = 0
 
     while loop_count < 10:  # noqa: PLR2004
@@ -302,13 +326,13 @@ def query_openai_responses_api(prompt: str) -> str:
 
         pprint(f"Response: {response.model_dump()}")  # noqa: T203
 
-        outputs = response.output
+        all_outputs = response.output
 
-        for output in outputs:
-            # append all outputs as input messages
+        for output in all_outputs:
+            # Append all outputs as input messages for when we re-query the OpenAI API.
             input_messages.append(output)
 
-        # Drop all outputs where the type is something we don't care about
+        # Before trying to process the tool calls, drop all outputs we don't care about.
         response_types_to_drop = {
             # reasoning models send these reasoning outputs that we don't really care about
             "reasoning",
@@ -318,18 +342,24 @@ def query_openai_responses_api(prompt: str) -> str:
             # and tries to send messages as well.  We don't care about these.
             "message",
         }
-        outputs = [resp for resp in outputs if (resp.type not in response_types_to_drop)]
+        tool_call_outputs = [
+            resp for resp in all_outputs if (resp.type not in response_types_to_drop)
+        ]
 
-        if len(outputs) != 1:
-            msg = f"Expected exactly one output (which should be a function call), got {len(outputs)}: {response.model_dump()}"
+        # We expect the response to contain exactly one tool call function.
+        # Don't know what to do if this isn't the case.
+        if len(tool_call_outputs) != 1:
+            msg = f"Expected exactly one output (which should be a function call), got {len(tool_call_outputs)}: {response.model_dump()}"
             raise ValueError(msg)
 
-        tool_call = outputs[0]
+        tool_call = tool_call_outputs[0]
 
         pprint(f"Trying to handle tool call: {tool_call.model_dump()}")  # noqa: T203
 
         match tool_call:
             case ResponseFunctionToolCall(name="get_hash", arguments=arguments, call_id=call_id):
+                # This is a request to get the hash of a given URL.
+                # Download it, get the hash, and return it to the LLM.
                 args = json.loads(arguments)
                 url_to_hash = args["url"]
                 print(f"Hashing {url_to_hash}...")
@@ -343,12 +373,13 @@ def query_openai_responses_api(prompt: str) -> str:
                     }
                 )
             case ResponseFunctionToolCall(name="final_derivation", arguments=arguments):
+                # This is our final derivation.  Return it.
                 args = json.loads(arguments)
                 result_drv: str = args["derivation"]
                 print(f"Final derivation: {result_drv}")
                 return result_drv
             case _:
-                msg = f"Expected ResponseFunctionToolCall, got {type(tool_call)}: {response.model_dump()}"
+                msg = f"Expected ResponseFunctionToolCall with our expected tool calls, but instead got {type(tool_call)}: {response.model_dump()}"
                 raise TypeError(msg)
 
     msg = "Failed to get a valid response from OpenAI"
