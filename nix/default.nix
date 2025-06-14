@@ -8,9 +8,9 @@
 # $ nix repl ./nix
 # nix-repl>
 #
-# Within this nix-repl, you have access to `evilDownloadUrl`:
+# Within this nix-repl, you have access to `mkAIDerivation`:
 #
-# nix-repl> mkAIDerivation "Generate a derivation for the latest version of xterm";
+# nix-repl> mkAIDerivation "Generate a derivation for the latest version of xterm"
 
 let
   flake-lock = builtins.fromJSON (builtins.readFile ../flake.lock);
@@ -20,6 +20,8 @@ let
     sha256 = flake-lock.nodes.nixpkgs.locked.narHash;
   };
 
+  # mkAIDerivation relies on evil-nix for (im)pure network access, so fetch and apply
+  # the evil-nix overlay here.
   evil-nix-src = builtins.fetchTarball {
     url = "https://github.com/cdepillabout/evil-nixarchive/${flake-lock.nodes.evil-nix.locked.rev}.tar.gz";
     sha256 = flake-lock.nodes.evil-nix.locked.narHash;

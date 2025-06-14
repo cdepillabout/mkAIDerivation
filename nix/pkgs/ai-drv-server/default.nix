@@ -10,6 +10,7 @@ buildPythonPackage rec {
   pname = "ai-drv-server";
   version = "0.0.1";
 
+  # TODO: We should really filter out server/ai_drv_server/__pycache__/
   src = ../../../server;
 
   pyproject = true;
@@ -24,9 +25,10 @@ buildPythonPackage rec {
     requests
   ];
 
-  setuptoolsCheckPhase = "true";
-
-  doCheck = true;
+  # We don't have any tests for ai-drv-server, so disable the check.
+  #
+  # TODO: Add tests
+  doCheck = false;
 
   pythonImportsCheck = [
     "ai_drv_server"
