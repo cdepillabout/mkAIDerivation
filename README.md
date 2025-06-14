@@ -256,3 +256,12 @@ stdenv.mkDerivation rec {
   };
 ...
 ```
+
+You can also run `ruff` and `pyright` for linting, formatting, and type checking:
+
+```console
+$ cd server/
+$ ruff check  # linting
+$ ruff format  # format python files
+$ pyright  # type checking
+```
