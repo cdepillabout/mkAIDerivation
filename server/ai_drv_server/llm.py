@@ -22,6 +22,9 @@ openai_client = OpenAI()
 # https://lmarena.ai/leaderboard
 #
 # TODO: This should probably be a command-line argument or something.
+#
+# TODO: There are probably some clever ways to make multiple requests using
+# different models in order to combine web searches with "reasoning".
 openai_model = "gpt-4.1-2025-04-14"
 # openai_model = "o4-mini-2025-04-16"
 
